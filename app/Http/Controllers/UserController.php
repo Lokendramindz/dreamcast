@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Role;
+
 
 class UserController extends Controller
 {
+
+   
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -27,7 +31,7 @@ class UserController extends Controller
         
         if ($request->hasFile('profile_image')) {
             $fileName = time() . '.' . $request->file('profile_image')->extension();
-            $request->file('profile_image')->storeAs('images', $fileName);
+            $filePath = $request->file('profile_image')->storeAs('images', $fileName, 'public');
             $data['profile_image'] = $fileName;
         }
 
@@ -36,9 +40,12 @@ class UserController extends Controller
         return response()->json(['message' => 'User created successfully'], 201);
     }
 
+ 
+
     public function index()
     {
-        return response()->json(User::with('role')->get());
+        $users = User::all(); // Retrieve all users
+        return view('users', compact('users')); // Directly point to 'users.blade.php'
     }
 }
 
